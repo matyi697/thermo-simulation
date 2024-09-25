@@ -140,17 +140,22 @@ void write_results(const char *file_path, double temperature[HEIGHT][WIDTH]) {
     fclose(output_file);
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+    if (argc < 3) {
+        printf("Helytelen argumentumok, helyes hasznalat:\n\t -%s [polygon file].txt [kimenet].csv\n", argv[0]);
+        return 1;
+    }
+
     double temperature[HEIGHT][WIDTH] = {0};
     Polygon polygons[MAX_POLYGONS] = {0};
     
-    int num_polygons = read_polygons("polygons.txt", polygons);
+    int num_polygons = read_polygons(argv[1], polygons);
     if (num_polygons < 0) return 1; 
 
     simulate_heat_conduction(&temperature[0][0], polygons, num_polygons);
 
-    write_results("results.csv", temperature);
+    write_results(argv[2], temperature);
     
-    printf("Kész!\n");
+    printf("Kesz!\n");
     return 0;
 }

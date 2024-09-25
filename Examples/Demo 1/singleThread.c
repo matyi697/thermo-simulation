@@ -113,7 +113,7 @@ void write_results(const char *file_path, double temperature[HEIGHT][WIDTH]) {
 
 int main(int argc, char* argv[]) {
     if (argc < 3) {
-        printf("Helytelen argumentumok, helyes hasznalat:\n\t -%s [polygon file].txt [kimenet].csv [iteraciok / szimulacio]\n", argv[0]);
+        printf("Helytelen argumentumok, helyes hasznalat:\n\t -%s [polygon file].txt [kimenet].csv\n", argv[0]);
         return 1;
     }
 
