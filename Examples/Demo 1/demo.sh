@@ -5,3 +5,6 @@ time ./singleThread polygons.txt results_s.csv
 nvcc -arch=sm_50 -o gpu gpu.cu
 echo "Az GPU futas ideje: "
 time ./gpu polygons.txt results_g.csv
+
+python plotter.py results_s.csv
+python plotter.py results_g.csv
