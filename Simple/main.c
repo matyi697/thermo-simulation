@@ -82,6 +82,7 @@ void simulate_heat_conduction(double temperature[HEIGHT][WIDTH], Polygon polygon
 
         for (int y = 1; y < HEIGHT - 1; y++) {
             for (int x = 1; x < WIDTH - 1; x++) {
+                /*a diszkret hoterjedesi modell matematikai alakja implementalva az en gridemre*/
                 new_temperature[y][x] = temperature[y][x] + K * (
                     (temperature[y + 1][x] - 2 * temperature[y][x] + temperature[y - 1][x]) / (DY * DY) +
                     (temperature[y][x + 1] - 2 * temperature[y][x] + temperature[y][x - 1]) / (DX * DX)
