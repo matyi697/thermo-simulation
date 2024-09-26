@@ -3,8 +3,8 @@
 #include <string.h>
 #include <math.h>
 
-#define WIDTH 100 
-#define HEIGHT 100    
+#define WIDTH 400 
+#define HEIGHT 400    
 #define DX 1.0             // x tengely felbontasa
 #define DY 1.0            // y tengely felbontasa
 #define K 0.1               // hovezetesi egyutthato

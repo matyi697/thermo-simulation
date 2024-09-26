@@ -4,8 +4,8 @@
 #include <math.h>
 #include <cuda.h>
 
-#define WIDTH 100 
-#define HEIGHT 100    
+#define WIDTH 400 
+#define HEIGHT 400    
 #define DX 1.0              
 #define DY 1.0              
 #define K 0.1               

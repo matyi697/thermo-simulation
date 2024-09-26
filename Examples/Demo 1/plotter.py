@@ -19,7 +19,7 @@ data.fillna(data.mean().mean(), inplace=True)
 data_array = data.to_numpy()
 
 # Hőtérkép megjelenítése
-plt.imshow(data_array, cmap='viridis', interpolation='nearest')
+plt.imshow(data_array, cmap='viridis', interpolation='bilinear')
 plt.colorbar(label='Temperature (°C)')
 plt.title('Temperature Distribution')
 plt.xlabel('X Coordinate')
