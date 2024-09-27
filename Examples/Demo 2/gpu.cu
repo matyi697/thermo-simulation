@@ -63,7 +63,7 @@ __device__ int is_point_in_polygon(double x, double y, Polygon *polygon) {
     return inside;
 }
 
-__global__ void update_temperature_kernel(double *temperature, Polygon *polygons, int num_polygons) {
+__global__ void update_temperature_kernel(double *temperature, Polygon *polygons, int num_polygons) {   //LEHETNE DEVICE IS
     int x = blockIdx.x * blockDim.x + threadIdx.x;
     int y = blockIdx.y * blockDim.y + threadIdx.y;
 
