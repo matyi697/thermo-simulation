@@ -3,10 +3,10 @@
 #include <string.h>
 #include <math.h>
 
-#define WIDTH 100 
-#define HEIGHT 100    
-#define DX 1.0             // x tengely felbontasa
-#define DY 1.0            // y tengely felbontasa
+#define WIDTH 100           // a szimulacio x merete
+#define HEIGHT 100          // a szimulacio y merete
+#define DX 1.0              // x tengely felbontasa
+#define DY 1.0              // y tengely felbontasa
 #define K 0.1               // hovezetesi egyutthato
 #define MAX_POLYGONS 100    // max polygon szam
 #define ITERATIONS 5000     // szimulacio itercioi (hanyszor fusson az automata)
@@ -19,7 +19,7 @@ typedef struct {
 
 int read_polygons(char *file_path, Polygon polygons[]) {
     FILE *file = fopen(file_path, "r");
-    if (!file) {
+    if (file == NULL) {
         perror("Bemeneti file hiba! (polygonok file)\n");
         return -1;
     }
@@ -47,6 +47,7 @@ int read_polygons(char *file_path, Polygon polygons[]) {
     return num_polygons;
 }
 
+/*ez a fuggveny egy okos modon nezi meg hogy egy pont benne van-e egy polygonban (halado pont algoritmus)*/
 int is_point_in_polygon(double x, double y, Polygon *polygon) {    
     int inside = 0;
     int j = polygon->num_vertices - 1;
@@ -55,13 +56,14 @@ int is_point_in_polygon(double x, double y, Polygon *polygon) {
         if ((polygon->vertices[i][1] > y) != (polygon->vertices[j][1] > y) &&   /*ez a resz ellenőrzi, hogy a pont a polygon melyik oldalan van*/
             (x < (polygon->vertices[j][0] - polygon->vertices[i][0]) * (y - polygon->vertices[i][1]) /  /*ezek a polygon oldalainak egyenletei alapjan nezi metszi-e*/
             (polygon->vertices[j][1] - polygon->vertices[i][1]) + polygon->vertices[i][0])) {
-            inside = !inside;
+            inside = !inside;   /*minden metszes valt (paros = nincs benne, paratlan = benne)*/
         }
         j = i;
     }
     return inside;
 }
 
+/*a hosugarzo blokkot minden iteracioban frissiteni kell az eredeti homersekletre*/
 void update_temperature(double temperature[HEIGHT][WIDTH], Polygon polygons[], int num_polygons) {
     for (int i = 0; i < num_polygons; i++) {
         double polygon_power = polygons[i].power;
@@ -98,7 +100,7 @@ void simulate_heat_conduction(double temperature[HEIGHT][WIDTH], Polygon polygon
 
 void write_results(const char *file_path, double temperature[HEIGHT][WIDTH]) {
     FILE *output_file = fopen(file_path, "w");
-    if (!output_file) {
+    if (output_file == NULL) {
         perror("Hiba az eredmenyek fileba irasakor!\n");
         return;
     }
