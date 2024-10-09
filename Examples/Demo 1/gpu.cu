@@ -68,7 +68,6 @@ __global__ void update_temperature_kernel(double *temperature, Polygon *polygons
     int y = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (x >= WIDTH || y >= HEIGHT) return; 
-    //ha nagyobb a szal index mint a tomb max index (5 ora debug utan jottem ra)
 
     double polygon_power = 0.0;
     for (int i = 0; i < num_polygons; i++) {
@@ -85,7 +84,6 @@ __global__ void simulate_heat_conduction_kernel(double *temperature, double *new
 
     if (x >= WIDTH || y >= HEIGHT || x == 0 || y == 0 || x == WIDTH - 1 || y == HEIGHT - 1) return;
     
-    /*ezt meg nem ertem teljesen*/
     new_temperature[y * WIDTH + x] = temperature[y * WIDTH + x] + K * (
         (temperature[(y + 1) * WIDTH + x] - 2 * temperature[y * WIDTH + x] + temperature[(y - 1) * WIDTH + x]) / (DY * DY) +
         (temperature[y * WIDTH + (x + 1)] - 2 * temperature[y * WIDTH + x] + temperature[y * WIDTH + (x - 1)]) / (DX * DX)
