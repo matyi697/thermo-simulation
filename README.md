@@ -25,7 +25,7 @@ A projekt célja, hogy megvizsgálja, hogyan teljesít a GPU-alapú hőmérsékl
 
 1. Klónozd a repót:
    ```bash
-   git clone https://github.com/felhasználónév/hovezetesi-szimulacio.git
+   git clone https://github.com/matyi697/thermo-simulation
    cd hovezetesi-szimulacio
    ```
 
