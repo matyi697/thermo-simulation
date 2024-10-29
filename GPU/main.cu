@@ -9,7 +9,7 @@
 #define DX 1.0              
 #define DY 1.0              
 #define K 0.1               
-#define MAX_POLYGONS 100    
+#define MAX_POLYGONS 3    
 #define ITERATIONS 5000     
 
 typedef struct {
