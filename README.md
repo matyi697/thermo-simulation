@@ -1,16 +1,94 @@
-# Egyszerű Hőterjedés Szimulátor
+# Hővezetési Szimulációs Program
 
-## Leírás
+Ez a projekt egy hővezetési szimulációs program, amely összehasonlítja a CPU (egyszálas C) és a GPU (CUDA) teljesítményét a hőmérséklet eloszlásának kiszámításában. A program beolvas egy poligonfájlt, amely a felületen lévő hősugárzó objektumokat ábrázolja, és kiszámítja a hővezetést egy meghatározott rácspontokon x iteráció után.
 
-Ez a projekt egy egyszerű hőterjedés szimulátor, amely két különböző megvalósítást hasonlít össze: egy CPU-alapú és egy GPU-alapú megoldást. A szimulátor célja a hőmérséklet eloszlásának modellezése egy 2D rácsos térben, és a teljesítménybeli különbségek kiértékelése.
+## Tartalomjegyzék
 
-## Funkciók
+- [Bevezetés](#bevezetés)
+- [Használat](#használat)
+- [Eredmények](#eredmények)
+- [Eredmények Plottolása](#eredmények-plottolása)
+- [Képek](#képek)
 
-- **CPU-alapú szimuláció**: A hőterjedési szimulációt a központi feldolgozóegységen valósítjuk meg.
-- **GPU-alapú szimuláció**: A hőterjedés szimulációját grafikus feldolgozóegységen (GPU) végezzük a CUDA platform segítségével.
-- **Teljesítménymérés**: A két megvalósítás futási idejének és teljesítményének összehasonlítása.
-- **Eredmények vizualizációja**: Az eredmények grafikus megjelenítése.
+## Bevezetés
+
+A projekt célja, hogy megvizsgálja, hogyan teljesít a GPU-alapú hőmérséklet-szimuláció a CPU-hoz képest. Az alkalmazás beolvas egy poligon-fájlt, amely tartalmazza a hősugárzó objektumok pozícióját és hősugárzási teljesítményét, és a hőmérséklet eloszlását számolja ki a megadott iterációk során.
+
+### Követelmények
+
+- CUDA 10.1 vagy újabb
+- GCC
+- Python 3.x
+- Matplotlib
+
+### Lépések
+
+1. Klónozd a repót:
+   ```bash
+   git clone https://github.com/felhasználónév/hovezetesi-szimulacio.git
+   cd hovezetesi-szimulacio
+   ```
+
+2. A C program fordítása (CPU):
+   ```bash
+   gcc -o Simple/main.c cpu_simulation.c -lm
+   ```
+
+3. A CUDA program fordítása (GPU):
+   ```bash
+   nvcc -o GPU/main.cu gpu_simulation.cu
+   ```
+
+4. A Python könyvtárak telepítése:
+   ```bash
+   pip install matplotlib numpy
+   ```
+
+## Használat
+
+A program futtatásához a következő parancsokat használhatod:
+
+### CPU verzió
+```bash
+./cpu_simulation polygonFile.txt results.csv
+```
+
+### GPU verzió
+```bash
+./gpu_simulation polygonFile.txt results.csv
+```
+
+Itt az `polygonFile.txt` a hősugárzó objektumokat tartalmazó fájl, míg a `results.csv` a hőszimuláció végén kapott hőmérséklet adatok pontfelhője.
 
 ## Eredmények
 
-A projekt célja a CPU és GPU alapú szimulációk összehasonlítása. Várhatóan a GPU verzió gyorsabb futási időt fog eredményezni a párhuzamos feldolgozás lehetősége miatt.
+A program a hőmérséklet eloszlást számolja ki a megadott rácspontokon, és a futási időt is kiértékeli mindkét megvalósítás esetében. A mért időket összehasonlítjuk a CPU és GPU verziók között.
+
+### Tesztek eredményei
+```plaintext
+#Teszt 1 - (400x400, polygon1.txt)
+CPU futási idő: 49,751 másodperc
+GPU futási idő: 2,074 másodperc
+
+#Teszt 2 - (400x400, polygon2.txt)
+CPU futási idő:  másodperc
+GPU futási idő:  másodperc
+
+#Teszt 2 - (400x400, polygon2.txt)
+CPU futási idő:  másodperc
+GPU futási idő:  másodperc
+```
+
+## Eredmények Plottolása
+
+A futási eredmények vizualizálásához futtasd a következő Python szkriptet:
+
+```bash
+python plotter.py results.csv --title "CPU/GPU" --interpolation "bilinear"
+```
+
+Ez a szkript megjeleníti a results.csv pontfelhőben lévő hőmérséklet adatokat egy hőmérsékleti térképen.
+
+## Képek
+
+![Hőmérséklet térkép CPU](Images/result_gpu.png)
