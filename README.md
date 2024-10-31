@@ -66,17 +66,17 @@ A program a hőmérséklet eloszlást számolja ki a megadott rácspontokon, és
 
 ### Tesztek eredményei
 ```plaintext
-#Teszt 1 - (400x400, polygon1.txt)
+#Teszt 1 - (400x400, polygons1.txt)
 CPU futási idő: 49,751 másodperc
 GPU futási idő: 2,074 másodperc
 
-#Teszt 2 - (400x400, polygon2.txt)
+#Teszt 2 - (400x400, polygons2.txt)
 CPU futási idő:  másodperc
 GPU futási idő:  másodperc
 
-#Teszt 2 - (400x400, polygon2.txt)
-CPU futási idő:  másodperc
-GPU futási idő:  másodperc
+#Teszt 3 - (400x400, polygons3.txt)
+CPU futási idő:  33,886 másodperc
+GPU futási idő:  2,126 másodperc
 ```
 
 ## Eredmények Plottolása
@@ -91,4 +91,5 @@ Ez a szkript megjeleníti a results.csv pontfelhőben lévő hőmérséklet adat
 
 ## Képek
 
-![Hőmérséklet térkép CPU](Images/result_gpu.png)
+![Hőmérséklet térkép CPU](Images/result_1.png)
+![Hőmérséklet térkép CPU](Images/result_3.png)
