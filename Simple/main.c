@@ -3,32 +3,42 @@
 #include <string.h>
 #include <math.h>
 
-#define WIDTH 100           // a szimulacio x merete
-#define HEIGHT 100          // a szimulacio y merete
-#define DX 1.0              // x tengely felbontasa
-#define DY 1.0              // y tengely felbontasa
-#define K 0.1               // hovezetesi egyutthato
-#define MAX_POLYGONS 100    // max polygon szam
-#define ITERATIONS 5000     // szimulacio itercioi (hanyszor fusson az automata)
+#define WIDTH 400           //  rács szélessége
+#define HEIGHT 400          //  rács magassága
+#define DX 1.0              //  hővezetési szimuláció x febontása
+#define DY 1.0              //  hővezetési szimuláció y febontása
+#define K 0.1               //  hővezetési együttható
+#define MAX_POLYGONS 100    //  maximális polygon tömb méret
+#define ITERATIONS 5000     //  szimuláció iterációi
 
+/*
+Ebben a structban tároljuk a polygonokat
+- a vertices a lapok ([0]->X, [1]->Y)
+- a power a hőteljesítmény amit leadnak
+Ebből a structbol ha több van akkor meg lehet valósítani több oldalú es több külön álló alakzatot is
+*/
 typedef struct {
-    double vertices[MAX_POLYGONS][2];   // polygon pontjai (x,y)
+    double vertices[MAX_POLYGONS][2];   
     int num_vertices;   
-    double power;                       // A polygon disszipacios teljesitmenye (W)
+    double power;                   
 } Polygon;
 
+/*
+Ez egy függvény ami beolvassa a polygon adatokat a txt fileból
+*/
 int read_polygons(char *file_path, Polygon polygons[]) {
     FILE *file = fopen(file_path, "r");
-    if (file == NULL) {
+    if (!file) {
         perror("Bemeneti file hiba! (polygonok file)\n");
         return -1;
     }
 
     char line[256];
     int num_polygons = 0;
-
+    
+    //beolvassuk az adatokat sorrol sorra a structba
     while (fgets(line, sizeof(line), file)) {
-        if (line[0] == 'p') {               // polygonok beolvasasa (p-vel kezdodo sorok)
+        if (line[0] == 'p') {                            // polygonok beolvasasa (p-vel kezdodo sorok)
             double x, y, power;
             sscanf(line + 1, "%lf %lf %lf", &x, &y, &power);
             Polygon *poly = &polygons[num_polygons];     //hogy ne kelljen minden polygon[] hasznalni igy szebb   
@@ -47,23 +57,29 @@ int read_polygons(char *file_path, Polygon polygons[]) {
     return num_polygons;
 }
 
-/*ez a fuggveny egy okos modon nezi meg hogy egy pont benne van-e egy polygonban (halado pont algoritmus)*/
+/*
+Ez a függvény az utazó pont algoritmussal meg tudja mondani hogy egy pont benne van-e egy polygonban
+az algoritmus forrása: https://www.geeksforgeeks.org/how-to-check-if-a-given-point-lies-inside-a-polygon/
+*/
 int is_point_in_polygon(double x, double y, Polygon *polygon) {    
     int inside = 0;
     int j = polygon->num_vertices - 1;
 
     for (int i = 0; i < polygon->num_vertices; i++) {
-        if ((polygon->vertices[i][1] > y) != (polygon->vertices[j][1] > y) &&   /*ez a resz ellenőrzi, hogy a pont a polygon melyik oldalan van*/
-            (x < (polygon->vertices[j][0] - polygon->vertices[i][0]) * (y - polygon->vertices[i][1]) /  /*ezek a polygon oldalainak egyenletei alapjan nezi metszi-e*/
+        if ((polygon->vertices[i][1] > y) != (polygon->vertices[j][1] > y) &&   /*ez a rész ellenőrzi, hogy a pont a polygon melyik oldálan van*/
+            (x < (polygon->vertices[j][0] - polygon->vertices[i][0]) * (y - polygon->vertices[i][1]) /  /*ezek a polygon oldalainak egyenletei alapján nézi metszi-e*/
             (polygon->vertices[j][1] - polygon->vertices[i][1]) + polygon->vertices[i][0])) {
-            inside = !inside;   /*minden metszes valt (paros = nincs benne, paratlan = benne)*/
+            inside = !inside;
         }
         j = i;
     }
     return inside;
 }
 
-/*a hosugarzo blokkot minden iteracioban frissiteni kell az eredeti homersekletre*/
+/*
+Ezzel a függvénnyel minden iteráció elején frissítjük a hősugárzó pontokat mivel a
+hőterjedés alatt "lehültek"
+*/
 void update_temperature(double temperature[HEIGHT][WIDTH], Polygon polygons[], int num_polygons) {
     for (int i = 0; i < num_polygons; i++) {
         double polygon_power = polygons[i].power;
@@ -78,13 +94,18 @@ void update_temperature(double temperature[HEIGHT][WIDTH], Polygon polygons[], i
     }
 }
 
+/*
+Ez a diszkrét hővezetési matematikai modell implementáció.
+A frissített hőmérséklet adatokat a gpu kódtól függetlenül az eredeti tömbben adjuk vissza.
+A matematikai egyenlet megértéséhez ezt a videót: https://www.youtube.com/watch?v=S8mopZlhRHE
+és ezt a wikipédia oldalt használtam fel: https://en.wikipedia.org/wiki/Heat_equation
+*/
 void simulate_heat_conduction(double temperature[HEIGHT][WIDTH], Polygon polygons[], int num_polygons) {
     for (int iter = 0; iter < ITERATIONS; iter++) {
         double new_temperature[HEIGHT][WIDTH] = {0};
 
         for (int y = 1; y < HEIGHT - 1; y++) {
             for (int x = 1; x < WIDTH - 1; x++) {
-                /*a diszkret hoterjedesi modell matematikai alakja implementalva a gridre*/
                 new_temperature[y][x] = temperature[y][x] + K * (
                     (temperature[y + 1][x] - 2 * temperature[y][x] + temperature[y - 1][x]) / (DY * DY) +
                     (temperature[y][x + 1] - 2 * temperature[y][x] + temperature[y][x - 1]) / (DX * DX)
@@ -93,14 +114,18 @@ void simulate_heat_conduction(double temperature[HEIGHT][WIDTH], Polygon polygon
         }
 
         update_temperature(new_temperature, polygons, num_polygons);
-
-        memcpy(temperature, new_temperature, sizeof(double) * HEIGHT * WIDTH);  //eredeti tommbe valo masolas (frissitese a reginek)
+        
+        //itt irjuk bele az új adatokat az eredeti tömbbe
+        memcpy(temperature, new_temperature, sizeof(double) * HEIGHT * WIDTH);
     }
 }
 
+/*
+Ez a függvény egy csv fileba menti a hőmérséklet adatokat
+*/
 void write_results(const char *file_path, double temperature[HEIGHT][WIDTH]) {
     FILE *output_file = fopen(file_path, "w");
-    if (output_file == NULL) {
+    if (!output_file) {
         perror("Hiba az eredmenyek fileba irasakor!\n");
         return;
     }
@@ -114,9 +139,14 @@ void write_results(const char *file_path, double temperature[HEIGHT][WIDTH]) {
     fclose(output_file);
 }
 
+/*
+A program 2 parancssori argumentummal dolgozik:
+-argv[1] : a polygon file neve
+-argv[2] : a kimeneti csv file neve
+*/
 int main(int argc, char* argv[]) {
     if (argc < 3) {
-        printf("Helytelen argumentumok, helyes hasznalat:\n\t -%s [polygon file].txt [kimenet].csv [iteraciok / szimulacio]\n", argv[0]);
+        printf("Helytelen argumentumok, helyes hasznalat:\n\t -%s [polygon file].txt [kimenet].csv\n", argv[0]);
         return 1;
     }
 
